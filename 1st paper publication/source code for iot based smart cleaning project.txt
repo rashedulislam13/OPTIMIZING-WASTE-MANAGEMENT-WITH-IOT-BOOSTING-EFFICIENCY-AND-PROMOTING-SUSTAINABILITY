@@ -1,0 +1,141 @@
+include ¡Servo.h¿
+include ¡LiquidCrystal.h¿
+include ¡HX711ADC:h >
+include < TinyGPS++:h >
+25const int HX711dout = 10;==mcu > HX711dout pin
+constintHX711sck = 11;==mcu > HX711sckpin
+HX711ADCLoadCell(HX711dout;HX711sck);
+const int rs = 22, en = 23, d4 = 24, d5 = 25, d6 = 26, d7 = 27;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+Servo myservo;
+TinyGPSPlus gps;
+define trigPinA1
+define echoPinA1
+define trigPinA2
+define echoPinA2
+define servo
+define LEDR
+define LEDB
+define LEDG
+unsigned long previousMillis = 0;
+const long interval = 2000;
+int FF = 0, S = 0;
+float latitude;
+float longitude;
+float speed;
+float satellites;
+String direction;
+float waight = 0;
+void setup()
+lcd.begin(16, 2);
+Serial.begin(9600);
+Serial1.begin(9600);
+Serial2.begin(9600);
+Serial3.begin(9600);
+myservo.attach(servo);
+myservo.write(0);
+pinMode(trigPinA1, OUTPUT);
+pinMode(echoPinA1, INPUT);
+pinMode(trigPinA2, OUTPUT);
+pinMode(echoPinA2, INPUT);
+pinMode(LEDR, OUTPUT);
+pinMode(LEDB, OUTPUT);
+pinMode(LEDG, OUTPUT);
+digitalWrite(LEDR, LOW);
+digitalWrite(LEDB, LOW);
+digitalWrite(LEDG, HIGH);
+LoadCell.begin(); LoadCell.start(1000); LoadCell.setCalFactor(52);
+void loop()
+while (Serial2.available() ¿ 0)
+if (gps.encode(Serial2.read()))
+displayInfo();
+int F = sennorA2();
+if (F ¡ 45)
+myservo.write(90);
+else
+LoadCell.update(); float i = LoadCell.getData();
+waight = (i / 1000);
+if (waight ¡= 0)
+waight = 0;
+myservo.write(0);
+FF = sennorA1();
+Serial.print(FF);
+FF = map(FF, 5, 28, 100, 0);
+if (FF ¡= 0)
+FF = 0;
+if (FF ¿= 100)
+FF = 100;
+Serial.print(”⁀”);
+Serial.println(FF);
+lcd.setCursor(0, 0);
+lcd.print(”D. W : ”);
+lcd.print(waight);
+lcd.print(” KG ”);
+lcd.setCursor(0, 1);
+lcd.print(”D. L : ”);
+lcd.print(FF);
+lcd.print(” if (FF ¡ 30)
+digitWrite(LEDR, LOW);
+digitWrite(LEDB, LOW);
+digitWrite(LEDG, HIGH);
+S = 0;
+else if (FF ¿= 50 FF ¡ 80)
+digitWrite(LEDR, LOW);
+digitWrite(LEDB, HIGH);
+digitWrite(LEDG, LOW);
+S = 0;
+else if (FF ¿= 80)
+digitWrite(LEDR, HIGH);
+digitWrite(LEDB, LOW);
+digitWrite(LEDG, LOW);
+if (S == 0)
+S = 1;
+String asd = ”Dustbin Full.....Take Action.....: ” + String(latitude, 6)
++ ”: ” + String(longitude, 67+ ”Level : ” + String(FF) + ”
+sendSMS(asd);
+unsigned long currM = millis();
+if (currM - prevsM ¿= interval)
+prevsM = currM;
+String sms = ”” + String(latitude, 6) + ”@” + String(longitude, 6) + ”@” + String(FF)
++ ”@” +
+String(waight) + ”*”; Serial.println(sms);
+Serial3.println(sms);
+delay(300);
+long sennorA1()
+digitWrite(trigPinA1, LOW);
+delayMs(2);
+digitWrite(trigPinA1, HIGH);
+delayMs(10);
+digitWrite(trigPinA1, LOW);
+long duration = pulseIn(echoPinA1, HIGH);
+int distance = duration * 0.034 / 2;
+return distance;
+long sennorA2()
+digitWrite(trigPinA2, LOW);
+delayMs(2);
+digitWrite(trigPinA2, HIGH);
+delayMs(10);
+digitWrite(trigPinA2, LOW);
+long duration = pulseIn(echoPinA2, HIGH);
+int distance = duration * 0.034 / 2;
+return distance;
+void sendSMS(String msg)
+Serial1.println(”AT”); updateSerial();
+Serial1.println(”AT+CMGF=1”); updateSerial();
+Serial1.println(”AT+CMGS=+8801324181158 ¨ ”); ¨
+updateSerial();
+Serial1.print(msg); updateSerial();
+Serial1.write(26);
+delay(3000);
+void updateSerial()
+delay(500);
+while (Serial1.available())
+Serial.write(Serial1.read());//Forward what Software Serial received to Serial Port
+void displayInfo()
+if (gps.location.isValid() )
+latitude = (gps.location.lat()); longitude = (gps.location.lng());
+Serial.print(”LAT: ”);
+Serial.println(latitude, 6); Serial.print(”LONG: ”);
+Serial.println(longitude, 6);
+speed = gps.speed.kmph(); direction = TinyGPSPlus::cardinal(gps.course.value()); satell
+= gps.satell.value();
